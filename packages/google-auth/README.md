@@ -476,23 +476,148 @@ export default function App() {
 
 ---
 
-## 🧪 Testing
+## 🧪 Testing the Package Locally Before Publishing
 
-Run the automated test suite:
+### Can I test the package locally before publishing?
+
+**Yes, absolutely.** The best and most reliable method is to compile the TypeScript source, generate a local `.tgz` archive tarball with `npm pack`, and install that tarball directly into a separate test application. `npm pack` creates the exact archive that would be published to npm or GitHub Packages, without uploading anything to a remote registry.
+
+---
+
+### Method 1: Testing with `npm pack` (Recommended for Pre-Release Verification)
+
+#### 1. Build and Preview Package Tarball
+From your package folder:
 
 ```bash
-cd packages/iitdh-google-auth
+cd C:\Users\hp\Documents\GitHub\iitdh-pkgs\packages\google-auth
 npm test
+npm run build
+npm pack --dry-run
 ```
 
-Tests verify:
-- Domain validation (accepts `@iitdh.ac.in`, rejects personal emails)
-- Cryptographic JWT signing and sliding expiration
-- Role authorization logic
-- Express authentication middleware
+> **Tip:** `npm pack --dry-run` displays the exact file list, total byte size, and bundle structure that will be packed without actually creating the archive.
+
+#### 2. Create the `.tgz` Tarball
+If the dry run output looks clean:
+
+```bash
+npm pack
+```
+
+This creates a local tarball file in the directory, for example:
+```text
+abhishekjuvatkar-iitdh-google-auth-1.0.0.tgz
+```
+
+#### 3. Install in a Separate Test Application
+Create or open a separate test project outside the package repository:
+
+```bash
+# Navigate outside the package folder
+cd C:\Users\hp\Documents\GitHub
+mkdir iitdh-auth-test
+cd iitdh-auth-test
+npm init -y
+
+# Install your local tarball archive directly (use your actual relative or absolute path)
+npm install "..\iitdh-pkgs\packages\google-auth\abhishekjuvatkar-iitdh-google-auth-1.0.0.tgz"
+```
+
+> **Note:** You do **not** need any GitHub token, internet connection, or registry authentication when installing a local `.tgz` archive.
+
+#### 4. Verify Installation and Imports
+Check the installed package in your test project:
+
+```bash
+npm ls @abhishekjuvatkar/iitdh-google-auth
+```
+
+You can now import modules normally in your React or Node.js test project:
+
+```typescript
+// Core shared definitions
+import { ... } from "@abhishekjuvatkar/iitdh-google-auth";
+
+// Subpath exports
+import { IITDHAuthProvider, useIITDHAuth, ProtectedRoute } from "@abhishekjuvatkar/iitdh-google-auth/react";
+import { createAuthRouter, auth, requireRole } from "@abhishekjuvatkar/iitdh-google-auth/node";
+import { IITDHAuthClient } from "@abhishekjuvatkar/iitdh-google-auth/client";
+```
+
+#### Why Testing the Built Tarball is Crucial:
+Do **not** test only with raw source file imports (`src/`). The package ships compiled artifacts from `dist/`, so packing and installing the `.tgz` guarantees:
+* ✅ The TypeScript compiler and `tsup` build successfully produced all outputs.
+* ✅ Both **ESM** (`import`) and **CommonJS** (`require`) dual-module bundles resolve properly.
+* ✅ All subpath exports (`/react`, `/node`, `/client`) map to their respective `.d.ts` declaration types and JavaScript code.
+* ✅ Only intended release files (`dist/`, `README.md`, `LICENSE`, `CHANGELOG.md`) are included, leaving behind test scripts, scratch files, and internal source code.
+* ✅ The package functions independently in an isolated environment with its declared `dependencies` and `peerDependencies`.
+
+---
+
+### Method 2: Rapid Iteration During Active Development (`npm link`)
+
+When you are actively developing and modifying features, packing and reinstalling a tarball on every change can be slow. `npm link` creates a symbolic link so your test app instantly picks up changes.
+
+#### In the package folder:
+```bash
+cd C:\Users\hp\Documents\GitHub\iitdh-pkgs\packages\google-auth
+npm link
+```
+
+#### In your test application:
+```bash
+cd C:\Users\hp\Documents\GitHub\iitdh-auth-test
+npm link @abhishekjuvatkar/iitdh-google-auth
+```
+
+#### Workflow on code changes:
+Whenever you edit code in `src/`, rebuild the package:
+```bash
+cd C:\Users\hp\Documents\GitHub\iitdh-pkgs\packages\google-auth
+npm run build
+```
+The test app will automatically use the updated build from `dist/`.
+
+#### Clean up / unlink:
+When you are done developing:
+```bash
+cd C:\Users\hp\Documents\GitHub\iitdh-auth-test
+npm unlink @abhishekjuvatkar/iitdh-google-auth
+npm install
+```
+
+---
+
+## 🚀 Recommended Release & Publishing Workflow
+
+Follow this step-by-step checklist before every release:
+
+```bash
+# 1. Run automated unit tests
+npm test
+
+# 2. Compile TypeScript & bundle production artifacts
+npm run build
+
+# 3. Dry-run pack inspection
+npm pack --dry-run
+
+# 4. Create local package archive & verify in test app
+npm pack
+
+# 5. Bump version (patch, minor, or major)
+npm version patch
+
+# 6. Publish to GitHub Packages / NPM Registry
+npm publish --registry=https://npm.pkg.github.com
+```
+
+> **Important:** Every publish requires a version bump (e.g. `1.0.0` → `1.0.1`). Registries reject uploads of an existing version tag.
 
 ---
 
 ## 📄 License
 
 MIT © Indian Institute of Technology Dharwad.
+
