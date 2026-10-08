@@ -1,6 +1,6 @@
 {
   "name": "@abhishekjuvatkar/iitdh-google-auth",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Unified, plug-and-play Google Workspace (@iitdh.ac.in) Authentication SDK for React and Node.js projects at IIT Dharwad.",
   "author": "Indian Institute of Technology Dharwad",
   "license": "MIT",
