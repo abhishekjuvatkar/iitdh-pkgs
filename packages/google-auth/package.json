@@ -1,5 +1,5 @@
 {
-  "name": "@iitdh/google-auth",
+  "name": "@abhishekjuvatkar/iitdh-google-auth",
   "version": "1.0.0",
   "description": "Unified, plug-and-play Google Workspace (@iitdh.ac.in) Authentication SDK for React and Node.js projects at IIT Dharwad.",
   "author": "Indian Institute of Technology Dharwad",
@@ -96,11 +96,12 @@
     "typescript": "^5.7.3"
   },
   "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
     "access": "restricted"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Balaji-Hakari/MMD-MODULE.git",
-    "directory": "packages/iitdh-google-auth"
+    "url": "git+https://github.com/abhishekjuvatkar/iitdh-pkgs.git",
+    "directory": "packages/google-auth"
   }
 }
