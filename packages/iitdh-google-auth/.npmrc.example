@@ -1,5 +1,0 @@
-# Example .npmrc for consuming @iitdh/google-auth from GitHub Packages
-# Place this file in the root of any new IIT Dharwad React/Node.js project
-
-@iitdh:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
